@@ -7,14 +7,14 @@ const router = Router();
  * @swagger
  * tags:
  *   - name: Reports
- *     description: Generación y descarga de reportes
+ *     description: Gestión e ingesta de reportes de seguridad
  */
 
 /**
  * @swagger
- * /reports/generate:
+ * /reports/webhook:
  *   post:
- *     summary: Generar un nuevo reporte de seguridad
+ *     summary: Recibe el reporte JSON crudo desde el pipeline CI/CD (Snyk)
  *     tags: [Reports]
  *     requestBody:
  *       required: true
@@ -22,30 +22,13 @@ const router = Router();
  *         application/json:
  *           schema:
  *             type: object
- *             properties:
- *               format:
- *                 type: string
- *                 example: pdf
- *               filterBySeverity:
- *                 type: string
- *                 example: High
- *             required:
- *               - format
+ *             description: El JSON crudo de Snyk (puede ser un Objeto o un Array)
  *     responses:
- *       200:
- *         description: Reporte generado con URL de descarga
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 success:
- *                   type: boolean
- *                 message:
- *                   type: string
- *                 downloadUrl:
- *                   type: string
+ *       201:
+ *         description: Reporte procesado, guardado y notificado correctamente.
+ *       500:
+ *         description: Error procesando el reporte.
  */
-router.post("/generate", ReportController.generateReport);
+router.post("/webhook", ReportController.receiveReport);
 
 export default router;

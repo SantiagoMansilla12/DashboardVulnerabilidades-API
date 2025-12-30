@@ -1,25 +1,34 @@
 import type { Request, Response } from "express";
+import { ReportService } from "../services/report.service";
 
 export class ReportController {
-  // POST: Generar un reporte
-  static async generateReport(req: Request, res: Response) {
+  // POST: Recibir el reporte desde Azure/Snyk
+  static async receiveReport(req: Request, res: Response) {
     try {
-      const { format, filterBySeverity } = req.body; // Ejemplo: format = 'pdf'
+      const snykRawData = req.body;
 
-      // Lógica simulada
-      console.log(
-        `Generando reporte en formato ${format} para severidad ${filterBySeverity}`
-      );
+      if (
+        !snykRawData ||
+        (Array.isArray(snykRawData) && snykRawData.length === 0)
+      ) {
+        return res
+          .status(400)
+          .json({ success: false, message: "Payload vacío" });
+      }
 
-      res.status(200).json({
+      // Delegamos la lógica al servicio
+      const result = await ReportService.processSnykPayload(snykRawData);
+
+      return res.status(201).json({
         success: true,
-        message: "Reporte generado exitosamente",
-        downloadUrl: "/downloads/report-123.pdf", // URL simulada
+        message: "Reporte procesado exitosamente",
+        reportId: result.id, // ID del reporte guardado en BD
       });
     } catch (error) {
-      res
+      console.error("Error en receiveReport:", error);
+      return res
         .status(500)
-        .json({ success: false, message: "Error generando el reporte" });
+        .json({ success: false, message: "Error interno procesando reporte" });
     }
   }
 }

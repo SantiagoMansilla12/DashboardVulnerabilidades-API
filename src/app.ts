@@ -20,7 +20,6 @@ app.use("/api", routes);
 app.get("/health", (req, res) => {
   res.send("API Security is running OK");
 });
-
 app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
 app.listen(PORT, () => {
