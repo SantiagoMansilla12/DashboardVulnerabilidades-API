@@ -5,6 +5,7 @@ import dotenv from "dotenv";
 import routes from "./routes";
 import swaggerUi from "swagger-ui-express";
 import { swaggerSpec } from "./config/swagger";
+import { dbConnection } from "./config/database";
 
 dotenv.config();
 
@@ -22,6 +23,12 @@ app.get("/health", (req, res) => {
 });
 app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
-app.listen(PORT, () => {
-  console.log(`🚀 Servidor corriendo en http://localhost:${PORT}`);
-});
+async function main() {
+  await dbConnection();
+
+  app.listen(PORT, () => {
+    console.log(`🚀 Servidor corriendo en http://localhost:${PORT}`);
+  });
+}
+
+main();

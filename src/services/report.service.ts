@@ -8,7 +8,7 @@ export class ReportService {
     const summary = reportHelper.getExecutiveSummary();
     const allVulns = reportHelper.getAllVulnerabilities();
 
-    // const savedRecord = await this.saveToDatabase(summary, rawData, allVulns);
+    const savedRecord = await this.saveToDatabase(summary, rawData, allVulns);
 
     if (!summary.isClean) {
       await this.sendDiscordAlert(summary);
@@ -18,8 +18,7 @@ export class ReportService {
       );
     }
 
-    return { id: 0 };
-    // return savedRecord;
+    return savedRecord;
   }
 
   private static async saveToDatabase(
