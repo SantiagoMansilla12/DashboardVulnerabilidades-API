@@ -3,7 +3,7 @@ import { DiscordService } from "./discord.service";
 import { SnykReport } from "../models/report.model";
 
 export class ReportService {
-  static async processSnykPayload(rawData: any) {
+  static async processSnykPayload(rawData: any, repositoryName?: string) {
     const reportHelper = new SnykReport(rawData);
     const summary = reportHelper.getExecutiveSummary();
     const allVulns = reportHelper.getAllVulnerabilities();
@@ -11,10 +11,12 @@ export class ReportService {
     const savedRecord = await this.saveToDatabase(summary, rawData, allVulns);
 
     if (!summary.isClean) {
-      await this.sendDiscordAlert(summary);
+      await this.sendDiscordAlert(summary, repositoryName);
     } else {
+      const repoName = repositoryName || "proyecto(s) escaneado(s)";
+      
       await DiscordService.sendNotification(
-        `✅ Scan completado: Sin vulnerabilidades en **${summary.projectNames.join(", ")}**`
+        `✅ Scan completado: Sin vulnerabilidades en **${repoName}**`
       );
     }
 
@@ -56,7 +58,7 @@ export class ReportService {
     }
   }
 
-  private static async sendDiscordAlert(summary: any) {
+  private static async sendDiscordAlert(summary: any, repositoryName?: string) {
     let color = 3447003; // Azul
     let icon = "🔵";
     let titlePrefix = "Vulnerabilidades Bajas";
@@ -75,14 +77,16 @@ export class ReportService {
       titlePrefix = "Medium Security Warning";
     }
 
+    const repoName = repositoryName || "Repositorio escaneado";
+
     const embed = {
       title: `${icon} ${titlePrefix} - Snyk`,
-      description: `Se han detectado problemas de seguridad en el análisis.`,
+      description: `Se han detectado problemas de seguridad en **${repoName}**.`,
       color: color,
       fields: [
         {
-          name: "Proyectos",
-          value: summary.projectNames.join(", "),
+          name: "Repositorio",
+          value: repoName,
           inline: false,
         },
         {
