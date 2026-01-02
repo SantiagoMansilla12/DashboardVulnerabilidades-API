@@ -15,7 +15,12 @@
       "resolveSourceMapLocations": [
         "${workspaceFolder}/**",
         "!**/node_modules/**"
-      ]
+      ],
+      "serverReadyAction": {
+        "pattern": "🚀 Servidor corriendo en http://localhost:([0-9]+)",
+        "uriFormat": "http://localhost:%s/api-docs",
+        "action": "openExternally"
+      }
     },
     {
       "type": "node",
