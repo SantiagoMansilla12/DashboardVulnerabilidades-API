@@ -54,3 +54,11 @@ Thumbs.db
 *slnx.sqlite
 *.suo
 *.eslintcache
+
+# Environment variables
+.env
+.env.local
+.env.*.local
+
+# Cloned repositories
+repositories/
